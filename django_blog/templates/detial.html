@@ -1,0 +1,9 @@
+<!--在test.html文件下添加-->
+<!DOCTYPE html>
+{% extends "base.html" %}
+    {% block content %}
+            <h2>{{post_list.title}}</h2>
+            <p>{{post_list.author}}</p>
+            <p>{{post_list.article_catagory}}</p>
+            <p>{{post_list.content}}</p>
+    {% endblock %}

@@ -1,0 +1,15 @@
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.db
+# Python
+*.py[cod]
+*.so
+*.egg
+*.egg-info
+dist
+build
+# My configurations
+db.ini
+deplot_key_rsa
+
