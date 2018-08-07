@@ -1,0 +1,69 @@
+import xlsxwriter
+
+# 1 建立 工作簿 及工作表
+gzb_name = "动脑学院学生听课流量周报.xlsx"
+workbook = xlsxwriter.Workbook(gzb_name)
+
+# 工作表名称
+sheet_name = "20170904-20170910"
+worksheet = workbook.add_worksheet(sheet_name)
+
+# 画图  --  画柱状图  图表类型：column柱状图，pie饼图,scatter散点图等等
+chart = workbook.add_chart({"type": "column"})
+
+# 填充表格数据
+# 表头  第一行数据
+title_name = ["学科名称", "星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日", "平均流量"]
+
+# 学科名称列表 第一列
+course_name = ["python", "c", "c++", "java", "test"]
+
+# 数据读取的代码
+
+data = [[165, 116, 153, 138, 182, 287, 247],
+        [245, 266, 127, 298, 122, 278, 163],
+        [251, 160, 256, 133, 150, 134, 287],
+        [227, 158, 298, 286, 195, 254, 118],
+        [241, 225, 291, 283, 294, 243, 239]]
+
+# 设置第一行的属性，背景为红色
+format_title = workbook.add_format()
+format_title.set_bg_color("red")
+
+worksheet.write_row("A1", title_name, format_title)
+
+# 从A2开始写第一列， 学科名称
+worksheet.write_column("A2", course_name)
+
+for index, value in enumerate(data):
+    worksheet.write_row("B%s" % (2 + index), value)  # （row_index,clo_index）
+
+for i in range(2, 7):  # 2,3,4,5,6
+    str_row = str(i)
+    # worksheet.write_formula("I" + str_row, '=AVERAGE(B' + str_row + ':H' + str_row + ')')
+    worksheet.write_formula("I" + str_row, '=AVERAGE(B%s:H%s)' % (str_row, str_row))
+
+
+# 填充数据
+def chart_series(cur_row):
+    """cur_row 行号+1 行名称  cur_row 必须为字符串"""
+    chart.add_series(
+        {"categories": '=%s!$B$1:$H$1' % (sheet_name),  # 标签
+         "values": '=%s!$B$' % (sheet_name) + cur_row + ':$H$' + cur_row,  # 值  =表名称！$B$1:$B$3
+         "line": {"color": "black"},
+         "name": "=%s!$A$" % (sheet_name) + cur_row
+         }
+    )
+
+
+for row in range(2, 7):
+    chart_series(str(row))
+# 指定图大小
+chart.set_size({"width": 600, "height": 300})
+chart.set_title({"name": "课程流量周统计图"})
+chart.set_y_axis({"name": "人/天"})
+chart.set_table()
+
+
+worksheet.insert_chart("A8", chart)
+workbook.close()
