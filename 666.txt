@@ -1,0 +1,108 @@
+Excel中的自动过滤器是一种基于一些简单标准过滤2D数据范围的方法。
+
+_images / autofilter1.png
+应用自动过滤器
+第一步是使用以下autofilter()方法将自动筛选器应用于工作表中的单元格范围：
+
+worksheet.autofilter('A1:D11')
+像往常一样，您也可以使用行列表示法：
+
+worksheet.autofilter(0, 0, 10, 3)  # Same as above.
+过滤自动过滤器中的数据
+的autofilter()定义了该过滤器应用到并创建下拉选择的标题行中的单元格范围。为了过滤掉数据，有必要使用filter_column()或filter_column_list()方法将一些标准应用于列 。
+
+该filter_column方法用于根据简单标准过滤自动过滤器范围中的列：
+
+worksheet.filter_column('A', 'x > 2000')
+worksheet.filter_column('B', 'x > 2000 and x < 5000')
+仅指定过滤条件是不够的。您还必须隐藏与过滤条件不匹配的任何行。使用参数隐藏行 。无法自动过滤行，因为这不是文件格式的一部分。set_row() hiddenXlsxWriter
+
+以下是如何筛选数据范围以匹配自动筛选条件的示例：
+
+# Set the autofilter.
+worksheet.autofilter('A1:D51')
+
+# Add the filter criteria. The placeholder "Region" in the filter is
+# ignored and can be any string that adds clarity to the expression.
+worksheet.filter_column(0, 'Region == East')
+
+# Hide the rows that don't match the filter criteria.
+row = 1
+for row_data in (data):
+    region = row_data[0]
+
+    # Check for rows that match the filter.
+    if region == 'East':
+        # Row matches the filter, display the row as normal.
+        pass
+    else:
+        # We need to hide rows that don't match the filter.
+        worksheet.set_row(row, options={'hidden': True})
+
+    worksheet.write_row(row, 0, row_data)
+
+    # Move on to the next worksheet row.
+    row += 1
+为列设置过滤条件
+该filter_column()方法可用于根据简单条件过滤自动过滤器范围中的列：
+
+worksheet.filter_column('A', 'x > 2000')
+该column参数可以是零索引列号或字符串列名。
+
+以下运算符可用于设置过滤条件：
+
+Operator
+   ==
+   !=
+   >
+   <
+   >=
+   <=
+
+   and
+   or
+表达式可以包括单个语句或由分离的两个语句and和or操作符。例如：
+
+'x <  2000'
+'x >  2000'
+'x == 2000'
+'x >  2000 and x <  5000'
+'x == 2000 or  x == 5000'
+可以使用表达式中的值Blanks或NonBlanks在表达式中来过滤空白或非空白数据 ：
+
+'x == Blanks'
+'x == NonBlanks'
+Excel还允许一些简单的字符串匹配操作：
+
+'x == b*'      # begins with b
+'x != b*'      # doesn't begin with b
+'x == *b'      # ends with b
+'x != *b'      # doesn't end with b
+'x == *b*'     # contains b
+'x != *b*'     # doesn't contains b
+您还可以使用'*'匹配任何字符或数字，'?'以匹配任何单个字符或数字。Excel的过滤器不支持其他正则表达式量词。可以使用转义Excel的正则表达式字符'~'。
+
+x上述示例中的占位符变量可以替换为任何简单的字符串。实际占位符名称在内部被忽略，因此以下内容都是等效的：
+
+'x     < 2000'
+'col   < 2000'
+'Price < 2000'
+过滤条件只能应用于autofilter()方法指定范围内的列 。
+
+设置列列表过滤器
+在Excel 2007之前，只能使用1或2个过滤条件，例如上面显示的filter_column()方法。
+
+Excel 2007引入了一个新的列表样式过滤器，可以指定一个或多个“或”样式条件。例如，如果您的列包含一年中某些月份的数据，则可以根据特定月份过滤数据：
+
+_images / autofilter2.png
+该filter_column_list()方法可用于表示这些类型的过滤器：
+
+worksheet.filter_column_list('A', ['March', 'April', 'May'])
+可以选择一个或多个标准：
+
+worksheet.filter_column_list('A', ['March'])
+worksheet.filter_column_list('B', [100, 110, 120, 130])
+要过滤空白作为列表的一部分，请使用空白作为列表项：
+
+worksheet.filter_column_list('A', ['March', 'April', 'May', 'Blanks'])
+如上所述，仅指定过滤器是不够的。您还必须隐藏与过滤条件不匹配的任何行。
